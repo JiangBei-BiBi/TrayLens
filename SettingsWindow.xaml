@@ -1,0 +1,271 @@
+<Window x:Class="TrayLens.SettingsWindow"
+        x:ClassModifier="internal"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+        Title="TrayLens 设置"
+        Width="400" SizeToContent="Height"
+        WindowStyle="None" AllowsTransparency="False"
+        ResizeMode="NoResize" ShowInTaskbar="False"
+        WindowStartupLocation="Manual"
+        Background="Transparent"
+        FontFamily="Segoe UI Variable Text, Microsoft YaHei UI"
+        UseLayoutRounding="True">
+
+    <Window.Resources>
+        <SolidColorBrush x:Key="CtlBg" Color="#12000000"/>
+        <SolidColorBrush x:Key="CtlBorder" Color="#1F000000"/>
+        <SolidColorBrush x:Key="CtlHover" Color="#1A000000"/>
+        <SolidColorBrush x:Key="CtlPopup" Color="#FFF7F7F7"/>
+
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="{DynamicResource CtlBg}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource CtlBorder}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bg" CornerRadius="6" Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                              Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bg" Property="Background" Value="{DynamicResource CtlHover}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="TextBox">
+            <Setter Property="Foreground" Value="#E4000000"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border CornerRadius="6" Background="{DynamicResource CtlBg}"
+                                BorderBrush="{DynamicResource CtlBorder}" BorderThickness="1"
+                                Padding="8,3">
+                            <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="ComboBoxItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBoxItem">
+                        <Border x:Name="bg" CornerRadius="4" Margin="2,1" Padding="8,4"
+                                Background="Transparent">
+                            <ContentPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter TargetName="bg" Property="Background" Value="{DynamicResource CtlHover}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="ComboBox">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <ToggleButton Focusable="False" ClickMode="Press"
+                                          IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Border x:Name="bg" CornerRadius="6" Background="{DynamicResource CtlBg}"
+                                                BorderBrush="{DynamicResource CtlBorder}" BorderThickness="1">
+                                            <Grid>
+                                                <ContentPresenter Margin="8,0,22,0" VerticalAlignment="Center"
+                                                                  HorizontalAlignment="Left"
+                                                                  Content="{Binding SelectionBoxItem, RelativeSource={RelativeSource AncestorType=ComboBox}}"/>
+                                                <TextBlock Text="&#xE70D;" FontFamily="Segoe Fluent Icons"
+                                                           FontSize="8" Margin="0,0,8,0"
+                                                           HorizontalAlignment="Right" VerticalAlignment="Center"
+                                                           Foreground="{DynamicResource CtlBorder}"/>
+                                            </Grid>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="bg" Property="Background" Value="{DynamicResource CtlHover}"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+
+                            <Popup IsOpen="{TemplateBinding IsDropDownOpen}" Placement="Bottom"
+                                   AllowsTransparency="True" PopupAnimation="Fade">
+                                <Border CornerRadius="6" Background="{DynamicResource CtlPopup}"
+                                        BorderBrush="{DynamicResource CtlBorder}" BorderThickness="1"
+                                        Margin="0,2,0,0"
+                                        MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=ComboBox}}">
+                                    <ItemsPresenter/>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <shell:WindowChrome.WindowChrome>
+        <shell:WindowChrome CaptionHeight="0" ResizeBorderThickness="0" GlassFrameThickness="-1" CornerRadius="0"/>
+    </shell:WindowChrome.WindowChrome>
+
+    <Border x:Name="Shell" BorderThickness="1" BorderBrush="#18000000" CornerRadius="10" Padding="20,16,20,16">
+        <StackPanel>
+            <StackPanel x:Name="Header" MouseLeftButtonDown="OnDrag" Background="Transparent">
+                <TextBlock Text="设置" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,10"
+                           x:Name="TitleText"/>
+            </StackPanel>
+
+            <!-- 分页 -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                <Button x:Name="TabDisplay" Content="显示" Tag="0" Width="74" Height="28" Click="OnTabClick"/>
+                <Button x:Name="TabLook" Content="外观" Tag="1" Width="74" Height="28" Margin="6,0,0,0"
+                        Click="OnTabClick"/>
+                <Button x:Name="TabAlerts" Content="预警" Tag="2" Width="74" Height="28" Margin="6,0,0,0"
+                        Click="OnTabClick"/>
+            </StackPanel>
+
+            <Grid>
+                <!-- 显示 -->
+                <StackPanel x:Name="PageDisplay">
+                    <TextBlock x:Name="SectionText" Text="模块（勾选显示，箭头排序）" FontSize="11"
+                               FontWeight="SemiBold" Margin="0,0,0,6"/>
+                    <StackPanel x:Name="ModuleList" Margin="0,0,0,10"/>
+
+                    <CheckBox x:Name="TopmostCheck" Content="始终置顶" Margin="0,0,0,6" Click="OnToggle"/>
+                    <CheckBox x:Name="BatteryIconCheck" Content="显示电量托盘图标" Margin="0,0,0,6"
+                              Click="OnToggle"/>
+                    <CheckBox x:Name="HoverCheck" Content="悬停时自动展开详情" Margin="0,0,0,6"
+                              Click="OnToggle"/>
+                    <CheckBox x:Name="ProxyCheck" Content="显示代理线路（Clash 节点与延迟）" Margin="0,0,0,6"
+                              Click="OnToggle"/>
+                    <CheckBox x:Name="PinCheck" Content="固定贴任务栏右侧（不可拖动）" Margin="0,0,0,6"
+                              Click="OnToggle"/>
+                    <CheckBox x:Name="StartupCheck" Content="开机自动启动" Margin="0,0,0,10"
+                              Click="OnToggle"/>
+
+                    <DockPanel Margin="0,0,0,10">
+                        <TextBlock x:Name="HotkeyLabel" Text="快捷键" FontSize="11" VerticalAlignment="Center"
+                                   Width="52"/>
+                        <ComboBox x:Name="HotkeyModBox" Width="104" SelectionChanged="OnHotkeyChanged"/>
+                        <TextBlock Text="+" FontSize="11" VerticalAlignment="Center" Margin="6,0"/>
+                        <ComboBox x:Name="HotkeyKeyBox" Width="64" SelectionChanged="OnHotkeyChanged"/>
+                    </DockPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock x:Name="ShowDelayLabel" Text="展开延迟" FontSize="11" VerticalAlignment="Center"
+                                   Margin="0,0,6,0"/>
+                        <ComboBox x:Name="ShowDelayBox" Width="78" Margin="0,0,14,0"
+                                  SelectionChanged="OnDelayChanged"/>
+                        <TextBlock x:Name="HideDelayLabel" Text="收起延迟" FontSize="11" VerticalAlignment="Center"
+                                   Margin="0,0,6,0"/>
+                        <ComboBox x:Name="HideDelayBox" Width="78" SelectionChanged="OnDelayChanged"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- 外观 -->
+                <StackPanel x:Name="PageLook" Visibility="Collapsed">
+                    <TextBlock x:Name="LookSectionText" Text="背景" FontSize="11" FontWeight="SemiBold"
+                               Margin="0,0,0,8"/>
+
+                    <DockPanel Margin="0,0,0,10">
+                        <TextBlock x:Name="BackdropLabel" Text="样式" FontSize="11" VerticalAlignment="Center"
+                                   Width="48"/>
+                        <ComboBox x:Name="BackdropBox" Width="150" HorizontalAlignment="Left"
+                                  SelectionChanged="OnBackdropChanged"/>
+                    </DockPanel>
+
+                    <DockPanel Margin="0,0,0,10">
+                        <TextBlock x:Name="OpacityLabel" Text="不透明度" FontSize="11" VerticalAlignment="Center"
+                                   Width="58"/>
+                        <TextBlock x:Name="OpacityValue" DockPanel.Dock="Right" Width="36" TextAlignment="Right"
+                                   FontSize="11" VerticalAlignment="Center"/>
+                        <Slider x:Name="OpacitySlider" Minimum="20" Maximum="100" SmallChange="5" LargeChange="10"
+                                VerticalAlignment="Center" ValueChanged="OnOpacityChanged"/>
+                    </DockPanel>
+
+                    <DockPanel Margin="0,0,0,4">
+                        <Button x:Name="PickImageButton" Content="选择图片…" Height="26" Padding="12,0"
+                                Click="OnPickImage"/>
+                        <TextBlock x:Name="ImagePathText" FontSize="10" Margin="8,0,0,0" VerticalAlignment="Center"
+                                   TextTrimming="CharacterEllipsis"/>
+                    </DockPanel>
+
+                    <TextBlock Text="自定义图片只在面板上生效，设置页固定用亚克力以便看清控件。" FontSize="10"
+                               Margin="0,8,0,0" TextWrapping="Wrap" x:Name="ImageHintText"/>
+                </StackPanel>
+
+                <!-- 预警 -->
+                <StackPanel x:Name="PageAlerts" Visibility="Collapsed">
+                    <TextBlock Text="超过阈值并持续指定秒数后，会在右下角弹出提醒。文案就是提醒的标题，数值会自动附在后面。"
+                               FontSize="10" Margin="0,0,0,10" TextWrapping="Wrap" x:Name="AlertHintText"/>
+
+                    <DockPanel Margin="0,0,0,4">
+                        <CheckBox x:Name="CpuAlertCheck" Content="CPU" Width="76" Click="OnAlertChanged"/>
+                        <TextBlock Text="高于" FontSize="11" VerticalAlignment="Center"/>
+                        <TextBox x:Name="CpuThresholdBox" Width="42" Margin="4,0,4,0" TextChanged="OnAlertChanged"/>
+                        <TextBlock Text="% 持续" FontSize="11" VerticalAlignment="Center"/>
+                        <TextBox x:Name="CpuSecondsBox" Width="42" Margin="4,0,4,0" TextChanged="OnAlertChanged"/>
+                        <TextBlock Text="秒" FontSize="11" VerticalAlignment="Center"/>
+                    </DockPanel>
+                    <TextBox x:Name="CpuTextBox" Margin="24,0,0,12" TextChanged="OnAlertChanged"/>
+
+                    <DockPanel Margin="0,0,0,4">
+                        <CheckBox x:Name="MemAlertCheck" Content="内存" Width="76" Click="OnAlertChanged"/>
+                        <TextBlock Text="高于" FontSize="11" VerticalAlignment="Center"/>
+                        <TextBox x:Name="MemThresholdBox" Width="42" Margin="4,0,4,0" TextChanged="OnAlertChanged"/>
+                        <TextBlock Text="% 持续" FontSize="11" VerticalAlignment="Center"/>
+                        <TextBox x:Name="MemSecondsBox" Width="42" Margin="4,0,4,0" TextChanged="OnAlertChanged"/>
+                        <TextBlock Text="秒" FontSize="11" VerticalAlignment="Center"/>
+                    </DockPanel>
+                    <TextBox x:Name="MemTextBox" Margin="24,0,0,12" TextChanged="OnAlertChanged"/>
+
+                    <DockPanel Margin="0,0,0,4">
+                        <CheckBox x:Name="GpuAlertCheck" Content="GPU" Width="76" Click="OnAlertChanged"/>
+                        <TextBlock Text="高于" FontSize="11" VerticalAlignment="Center"/>
+                        <TextBox x:Name="GpuThresholdBox" Width="42" Margin="4,0,4,0" TextChanged="OnAlertChanged"/>
+                        <TextBlock Text="% 持续" FontSize="11" VerticalAlignment="Center"/>
+                        <TextBox x:Name="GpuSecondsBox" Width="42" Margin="4,0,4,0" TextChanged="OnAlertChanged"/>
+                        <TextBlock Text="秒" FontSize="11" VerticalAlignment="Center"/>
+                    </DockPanel>
+                    <TextBox x:Name="GpuTextBox" Margin="24,0,0,6" TextChanged="OnAlertChanged"/>
+
+                    <DockPanel Margin="24,0,0,4">
+                        <TextBlock Text="温度超过" FontSize="11" VerticalAlignment="Center"/>
+                        <TextBox x:Name="GpuTempBox" Width="42" Margin="4,0,4,0" TextChanged="OnAlertChanged"/>
+                        <TextBlock Text="℃ 时提醒" FontSize="11" VerticalAlignment="Center"/>
+                    </DockPanel>
+                    <TextBox x:Name="GpuTempTextBox" Margin="24,0,0,12" TextChanged="OnAlertChanged"/>
+
+                    <DockPanel Margin="0,0,0,4">
+                        <CheckBox x:Name="BattAlertCheck" Content="设备电量" Width="76" Click="OnAlertChanged"/>
+                        <TextBlock Text="低于" FontSize="11" VerticalAlignment="Center"/>
+                        <TextBox x:Name="BattThresholdBox" Width="42" Margin="4,0,4,0" TextChanged="OnAlertChanged"/>
+                        <TextBlock Text="%" FontSize="11" VerticalAlignment="Center"/>
+                    </DockPanel>
+                    <TextBox x:Name="BattTextBox" Margin="24,0,0,4" TextChanged="OnAlertChanged"/>
+                </StackPanel>
+            </Grid>
+
+            <Button x:Name="CloseButton" Content="完成" Width="88" Height="30" Margin="0,16,0,0"
+                    HorizontalAlignment="Right" Click="OnClose"/>
+        </StackPanel>
+    </Border>
+</Window>
